@@ -119,7 +119,7 @@ class Game:
 
 if __name__ == "__main__":
     pygame.init()
-    game = Game(pygame.display.set_mode((800,600), pygame.RESIZABLE))
+    game = Game(pygame.display.set_mode((600,600), pygame.RESIZABLE))
 
 
 
