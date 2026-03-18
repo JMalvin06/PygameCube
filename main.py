@@ -34,9 +34,11 @@ class Game:
     
     def update(self):
         self.screen.fill(bg_color) # clear screen
+        self.draw_cube()
+        self.process_input()
 
-        half_width = self.cube_width/2 # Simple helper variable
-
+       
+    def draw_cube(self):
         # Reset polygon data
         self.polygon_faces = [[] for i in range(6)]
         self.cull_vals = [0 for i in range(6)]
@@ -56,16 +58,14 @@ class Game:
                 self.register_point(i, 1, i*j, 4)
                 self.register_point(i, -1, i*j, 5)
         
+        # Draw polygons
         for i in range(0, len(self.cull_vals)-1, 2):
+            # Check Z values to determine render priority
             draw_face = i if self.cull_vals[i] > self.cull_vals[i+1] else i+1
             pygame.draw.polygon(self.screen, colors[draw_face], self.polygon_faces[draw_face])
             if self.has_outline: 
                 scaled_width = int(self.outline_width * (self.cube_width/120)) if int(self.outline_width * (self.cube_width/120)) > 3 else 3
                 pygame.draw.polygon(self.screen, self.outline_color, self.polygon_faces[draw_face],scaled_width)
-        
-        self.process_input()
-
-       
 
     def process_input(self):
         pygame.mouse.get_pos()[0]
@@ -96,10 +96,13 @@ class Game:
         self.mouse_wheel = 0
 
     def register_point(self, i: int, j: int, k: int, id: int):
+        # Rotate point accordingly
         coords = Vector3(i,j,k)
         face_point = Vector3(self.rotate_x(coords),self.rotate_y(coords),self.rotate_z(coords)) * self.cube_width/2
+
+        # Add point to polygon list
         self.polygon_faces[id].append((int(face_point.x + self.screen.get_width()/2), int(face_point.y + self.screen.get_height()/2)))
-        self.cull_vals[id] += face_point.z
+        self.cull_vals[id] += face_point.z #increment cull value for polygon
 
     def rotate_x(self, coords: Vector3):
         return coords.x*math.cos(self.z_rot)*math.cos(self.y_rot) + coords.y*(math.cos(self.z_rot)*math.sin(self.y_rot)*math.sin(self.x_rot) - math.sin(self.z_rot)*math.cos(self.x_rot)) + coords.z*(math.sin(self.z_rot)*math.sin(self.x_rot) + math.cos(self.z_rot)*math.sin(self.y_rot)*math.cos(self.x_rot))
@@ -132,7 +135,7 @@ while True:
         
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_o: game.has_outline = not game.has_outline
-    pygame.display.set_caption(f'{clock.get_fps() :.1f}')
+    pygame.display.set_caption("FPS: " + f'{clock.get_fps() :.1f}')
     pygame.display.flip()
     game.update()
     clock.tick(60)
