@@ -124,11 +124,11 @@ if __name__ == "__main__":
 
 
 clock = pygame.time.Clock()
-while True:
+running = True
+while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            pygame.quit()
-            exit()
+            running = false
         
         if event.type == pygame.MOUSEWHEEL:
             game.mouse_wheel = event.y 
@@ -139,3 +139,6 @@ while True:
     pygame.display.flip()
     game.update()
     clock.tick(60)
+
+pygame.display.quit()
+pygame.quit()
